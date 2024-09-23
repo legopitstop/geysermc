@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List, Dict
 from pydantic import BaseModel
 from PIL import Image
 from io import BytesIO
@@ -54,7 +54,7 @@ class RecentConvertedSkinReference(BaseModel):
 
 
 class RecentConvertedSkinlist(BaseModel):
-    data: list[RecentConvertedSkinReference]
+    data: List[RecentConvertedSkinReference]
     total_pages: int
 
     def __iter__(self):
@@ -68,7 +68,7 @@ class UploadQueue(BaseModel):
 
 
 class Statistics(BaseModel):
-    pre_upload_queue: dict[str, int]
+    pre_upload_queue: Dict[str, int]
     upload_queue: UploadQueue
 
 
@@ -80,7 +80,7 @@ class UsernameProfile(BaseModel):
 class Project(BaseModel):
     project_id: str
     project_name: str
-    versions: list[str]
+    versions: List[str]
 
     def __iter__(self):
         for x in self.versions:
@@ -91,7 +91,7 @@ class ProjectVersion(BaseModel):
     project_id: str
     project_name: str
     version: str
-    builds: list[int]
+    builds: List[int]
 
     def __iter__(self):
         for x in self.builds:
@@ -114,15 +114,15 @@ class Build(BaseModel):
     time: datetime
     channel: str
     promoted: bool
-    changes: list[BuildChange]
-    downloads: dict[str, Download]
+    changes: List[BuildChange]
+    downloads: Dict[str, Download]
 
 
 class Buildlist(BaseModel):
     project_id: str
     project_name: str
     version: str
-    builds: list[Build]
+    builds: List[Build]
 
     def __iter__(self):
         for x in self.builds:
@@ -136,7 +136,7 @@ class Info(BaseModel):
 
 class Server(BaseModel):
     url: str
-    variables: dict[str, str]
+    variables: Dict[str, str]
 
 
 # API
@@ -169,20 +169,20 @@ class GeyserMC:
             return Link.model_validate(res)
         return None
 
-    def get_java_link(self, uuid: str) -> list[Link]:
+    def get_java_link(self, uuid: str) -> List[Link]:
         """
         Get linked Bedrock account from Java UUID
 
         :param uuid: Java UUID
         :type uuid: str
         :return: Linked account or an empty object if there is no account linked
-        :rtype: list[Link]
+        :rtype: List[Link]
         """
         res = self._get(API_ENDPOINT, f"/v2/link/java/{uuid}").json()
         return [Link.model_validate(x) for x in res]
 
     # TODO: illegal online link data, internal server error, received invalid tokens, The provided value for the 'code' parameter is not valid.
-    def verify_online_link(self, bedrock: str = "", java: str = "") -> list[str]:
+    def verify_online_link(self, bedrock: str = "", java: str = "") -> List[str]:
         payload = {}
         if bedrock:
             payload["bedrock"] = bedrock
@@ -201,7 +201,7 @@ class GeyserMC:
         res = self._get(API_ENDPOINT, "/v2/stats").json()
         return Statistics.model_validate(res)
 
-    def get_gamertag_batch(self, *xuids: str) -> dict[str, str]:
+    def get_gamertag_batch(self, *xuids: str) -> Dict[str, str]:
         data = (
             self.session.post(
                 API_ENDPOINT + "/v2/xbox/batch/gamertag", json={"xuids": list(xuids)}
@@ -262,7 +262,7 @@ class GeyserMC:
             return ConvertedSkin.model_validate(res)
         return None
 
-    def get_project_news(self, project: str) -> list[str]:
+    def get_project_news(self, project: str) -> List[str]:
         return list(self._get(API_ENDPOINT, f"/v2/news/{project}").json())
 
     def get_bedrock_or_java_uuid(
@@ -287,12 +287,12 @@ class GeyserMC:
 
     # DOWNLOAD
 
-    def get_projects(self) -> list[str]:
+    def get_projects(self) -> List[str]:
         """
         Gets a list of all available projects.
 
         :return: All available projects.
-        :rtype: list[str]
+        :rtype: List[str]
         """
         return list(self._get(DOWNLOAD_ENDPOINT, "/v2/projects").json()["projects"])
 
