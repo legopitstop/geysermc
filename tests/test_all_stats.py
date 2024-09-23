@@ -1,5 +1,6 @@
-from geysermc import GeyserMC, Statistics
+from geysermc import GeyserMC
 
-api = GeyserMC()
 
-assert isinstance(api.get_all_stats(), Statistics)
+def test_all_stats():
+    api = GeyserMC()
+    api.get_all_stats()

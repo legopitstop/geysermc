@@ -1,7 +1,8 @@
 from geysermc import GeyserMC
 
-api = GeyserMC()
 
-res = api.get_recent_uploads()
-for i in res:
-    print(i)
+def test_recent_uploads():
+    api = GeyserMC()
+    res = api.get_recent_uploads()
+    for i in res:
+        print(i)

@@ -1,5 +1,6 @@
 from geysermc import GeyserMC
 
-api = GeyserMC()
 
-print(api.get_bedrock_link(2535429120293563))
+def test_bedrock_link():
+    api = GeyserMC()
+    print(api.get_bedrock_link(2535429120293563))

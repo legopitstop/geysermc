@@ -1,5 +1,21 @@
 from geysermc import GeyserMC
+import pytest
 
-api = GeyserMC()
 
-print(api.get_project("geyser"))
+@pytest.mark.parametrize(
+    "project",
+    [
+        ("floodgate"),
+        ("geyser"),
+        ("erosion"),
+        ("geyserconnect"),
+        ("geyseroptionalpack"),
+        ("hydraulic"),
+        ("geyserpreview"),
+        ("thirdpartycosmetics"),
+        ("hurricane"),
+    ],
+)
+def test_project(project):
+    api = GeyserMC()
+    print(api.get_project(project))

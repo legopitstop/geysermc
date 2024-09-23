@@ -1,5 +1,7 @@
 from geysermc import GeyserMC
 
-api = GeyserMC()
 
-print(api.get_xuid("notch"))
+def test_xuid():
+    api = GeyserMC()
+
+    print(api.get_xuid("notch"))

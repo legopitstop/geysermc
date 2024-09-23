@@ -1,5 +1,6 @@
 from geysermc import GeyserMC
 
-api = GeyserMC()
 
-print(api.get_projects())
+def test_projects():
+    api = GeyserMC()
+    print(api.get_projects())
