@@ -1,3 +1,4 @@
+from typing import Union
 from pydantic import BaseModel
 from PIL import Image
 from io import BytesIO
@@ -13,7 +14,7 @@ __all__ = [
     "ConvertedSkin",
     "Link",
     "RecentConvertedSkinReference",
-    "RecentConvertedSkinList",
+    "RecentConvertedSkinlist",
     "Statistics",
     "UsernameProfile",
     "Project",
@@ -21,7 +22,7 @@ __all__ = [
     "BuildChange",
     "Download",
     "Build",
-    "BuildList",
+    "Buildlist",
     "Info",
     "Server",
     "GeyserMC",
@@ -52,7 +53,7 @@ class RecentConvertedSkinReference(BaseModel):
     texture_id: str
 
 
-class RecentConvertedSkinList(BaseModel):
+class RecentConvertedSkinlist(BaseModel):
     data: list[RecentConvertedSkinReference]
     total_pages: int
 
@@ -61,9 +62,14 @@ class RecentConvertedSkinList(BaseModel):
             yield x
 
 
+class UploadQueue(BaseModel):
+    estimated_duration: float
+    length: int
+
+
 class Statistics(BaseModel):
     pre_upload_queue: dict[str, int]
-    upload_queue: dict[str, int | float]
+    upload_queue: UploadQueue
 
 
 class UsernameProfile(BaseModel):
@@ -112,7 +118,7 @@ class Build(BaseModel):
     downloads: dict[str, Download]
 
 
-class BuildList(BaseModel):
+class Buildlist(BaseModel):
     project_id: str
     project_name: str
     version: str
@@ -149,7 +155,7 @@ class GeyserMC:
             raise Exception(repr(data["message"]))
         raise Exception(data)
 
-    def get_bedrock_link(self, xuid: int) -> Link | None:
+    def get_bedrock_link(self, xuid: int) -> Union[Link, None]:
         """
         Get linked Java account from Bedrock xuid
 
@@ -170,7 +176,7 @@ class GeyserMC:
         :param uuid: Java UUID
         :type uuid: str
         :return: Linked account or an empty object if there is no account linked
-        :rtype: list
+        :rtype: list[Link]
         """
         res = self._get(API_ENDPOINT, f"/v2/link/java/{uuid}").json()
         return [Link.model_validate(x) for x in res]
@@ -232,17 +238,17 @@ class GeyserMC:
             self._get(API_ENDPOINT, f"/v2/xbox/xuid/{gamertag}").json().get("xuid")
         )
 
-    def get_recent_uploads(self) -> RecentConvertedSkinList:
+    def get_recent_uploads(self) -> RecentConvertedSkinlist:
         """
         Get a list of the most recently uploaded skins
 
         :return: The most recently uploaded skins. First element has been uploaded most recently etc.
-        :rtype: RecentConvertedSkinList
+        :rtype: RecentConvertedSkinlist
         """
         res = self._get(API_ENDPOINT, "/v2/skin/bedrock/recent").json()
-        return RecentConvertedSkinList.model_validate(res)
+        return RecentConvertedSkinlist.model_validate(res)
 
-    def get_skin(self, xuid: int) -> ConvertedSkin | None:
+    def get_skin(self, xuid: int) -> Union[ConvertedSkin, None]:
         """
         Get the most recently converted skin of a Bedrock player
 
@@ -270,7 +276,7 @@ class GeyserMC:
         :param prefix: The prefix used in your Floodgate config, defaults to "."
         :type prefix: str, optional
         :return: The Bedrock xuid in Floodgate UUID format and username. Response made to be identical to the Mojang endpoint
-        :rtype: dict[str,str]
+        :rtype: UsernameProfile
         """
         return UsernameProfile.model_validate(
             self._get(
@@ -316,7 +322,7 @@ class GeyserMC:
         ).json()
         return ProjectVersion.model_validate(res)
 
-    def get_version_builds(self, project: str, version: str = "latest") -> BuildList:
+    def get_version_builds(self, project: str, version: str = "latest") -> Buildlist:
         """
         Gets all available builds for a project's version.
 
@@ -324,12 +330,12 @@ class GeyserMC:
         :type project: str
         :param version: A version of the project., defaults to "latest"
         :type version: str, optional
-        :rtype: BuildList
+        :rtype: Buildlist
         """
         res = self._get(
             DOWNLOAD_ENDPOINT, f"/v2/projects/{project}/versions/{version}/builds"
         ).json()
-        return BuildList.model_validate(res)
+        return Buildlist.model_validate(res)
 
     def get_build(
         self, project: str, version: str = "latest", build: str = "latest"
@@ -356,7 +362,7 @@ class GeyserMC:
         project: str,
         download: str,
         version: str = "latest",
-        build: int | str = "latest",
+        build: str = "latest",
     ) -> bytes:
         """
         Downloads the given file from a build's data.
@@ -368,7 +374,7 @@ class GeyserMC:
         :param version: A version of the project., defaults to "latest"
         :type version: str, optional
         :param build: A build of the version., defaults to "latest"
-        :type build: int | str, optional
+        :type build: str, optional
         :rtype: bytes
         """
         return self.session.get(
