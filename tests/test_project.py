@@ -1,3 +1,5 @@
-import geysermc
+from geysermc import GeyserMC
 
-print(geysermc.get_project('geyser'))
+api = GeyserMC()
+
+print(api.get_project("geyser"))

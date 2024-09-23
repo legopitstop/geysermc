@@ -1,5 +1,6 @@
 # geysermc
 
+![Tests](https://github.com/legopitstop/geysermc/actions/workflows/tests.yml/badge.svg)
 [![PyPI](https://img.shields.io/pypi/v/geysermc)](https://pypi.org/project/geysermc/)
 [![Python](https://img.shields.io/pypi/pyversions/geysermc)](https://www.python.org/downloads//)
 ![Downloads](https://img.shields.io/pypi/dm/geysermc)
@@ -19,12 +20,18 @@ pip3 install geysermc
 
 Update existing installation: `pip3 install geysermc --upgrade`
 
+## Links
+
+- [Documentation](https://docs.lpsmods.dev/geysermc)
+- [Source Code](https://github.com/legopitstop/geysermc)
+
 ## Requirements
 
-| Name | Description |
-|--|--|
-| [`Pillow`](https://pypi.org/project/pillow/) | Python Imaging Library (Fork) |
+| Name                                             | Description                                      |
+| ------------------------------------------------ | ------------------------------------------------ |
+| [`Pillow`](https://pypi.org/project/pillow/)     | Python Imaging Library (Fork)                    |
 | [`requests`](https://pypi.org/project/requests/) | Requests is a simple, yet elegant, HTTP library. |
+| [`pydantic`](https://pypi.org/project/pydantic/) | Data validation using Python type hints          |
 
 ## Features
 
@@ -37,20 +44,24 @@ Update existing installation: `pip3 install geysermc --upgrade`
 Show bedrock player skin
 
 ```Python
-import geysermc
+from geysermc import GeyserMC
 
-xuid = geysermc.get_xuid('legopitstop')
-skin = geysermc.get_skin(xuid)
-image = geysermc.get_raw_texture(skin.texture_id)
+api = GeyserMC()
+
+xuid = api.get_xuid('legopitstop')
+skin = api.get_skin(xuid)
+image = api.get_raw_texture(skin.texture_id)
 image.show()
 ```
 
 Download Geyser plugin
 
 ```Python
-import geysermc
+from geysermc import GeyserMC
+
+api = GeyserMC()
 
 with open('geyser-spigot.jar', 'wb') as fd:
-    data = geysermc.get_download('geyser', 'spigot')
+    data = api.get_download('geyser', 'spigot')
     fd.write(data)
 ```

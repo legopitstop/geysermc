@@ -1,7 +1,9 @@
-from dataclasses import dataclass
+from pydantic.dataclasses import dataclass
+from pydantic import BaseModel, ConfigDict
 from PIL import Image, ImageFile
 from io import BytesIO
 import requests
+from datetime import datetime
 
 __version__ = "1.0.0"
 
@@ -10,54 +12,28 @@ CDN_ENDPOINT = "https://cdn.geysermc.org"
 DOWNLOAD_ENDPOINT = "https://download.geysermc.org"
 
 
-@dataclass
-class ConvertedSkin:
+# @dataclass
+class ConvertedSkin(BaseModel):
     hash: str
     is_steve: bool
     signature: str
     texture_id: str
     value: str
 
-    @staticmethod
-    def from_json(data):
-        return ConvertedSkin(
-            data["hash"],
-            data["is_steve"],
-            data["signature"],
-            data["texture_id"],
-            data["value"],
-        )
 
-
-@dataclass
-class Link:
+class Link(BaseModel):
     bedrock_id: int
     java_id: str
     java_name: str
     last_name_update: int
 
-    @staticmethod
-    def from_json(data):
-        return Link(
-            data["bedrock_id"],
-            data["java_id"],
-            data["java_name"],
-            data["last_name_update"],
-        )
 
-
-@dataclass
-class RecentConvertedSkinRefrance:
+class RecentConvertedSkinRefrance(BaseModel):
     id: int
     texture_id: str
 
-    @staticmethod
-    def from_json(data):
-        return RecentConvertedSkinRefrance(data["id"], data["texture_id"])
 
-
-@dataclass
-class RecentConvertedSkinList:
+class RecentConvertedSkinList(BaseModel):
     data: list[RecentConvertedSkinRefrance]
     total_pages: int
 
@@ -65,36 +41,18 @@ class RecentConvertedSkinList:
         for x in self.data:
             yield x
 
-    @staticmethod
-    def from_json(data: dict):
-        return RecentConvertedSkinList(
-            [RecentConvertedSkinRefrance.from_json(i) for i in data["data"]],
-            data["total_pages"],
-        )
+
+class Statistics(BaseModel):
+    pre_upload_queue: dict[str, int]
+    upload_queue: dict[str, int | float]
 
 
-@dataclass
-class Statistics:
-    pre_upload_queue: dict
-    upload_queue: dict
-
-    @staticmethod
-    def from_json(data):
-        return Statistics(data["pre_upload_queue"], data["upload_queue"])
-
-
-@dataclass
-class UsernameProfile:
+class UsernameProfile(BaseModel):
     id: str
     name: str
 
-    @staticmethod
-    def from_json(data):
-        return UsernameProfile(data["id"], data["name"])
 
-
-@dataclass
-class Project:
+class Project(BaseModel):
     project_id: str
     project_name: str
     versions: list[str]
@@ -103,13 +61,8 @@ class Project:
         for x in self.versions:
             yield x
 
-    @staticmethod
-    def from_json(data):
-        return Project(data["project_id"], data["project_name"], data["versions"])
 
-
-@dataclass
-class ProjectVersion:
+class ProjectVersion(BaseModel):
     project_id: str
     project_name: str
     version: str
@@ -119,60 +72,28 @@ class ProjectVersion:
         for x in self.builds:
             yield x
 
-    @staticmethod
-    def from_json(data):
-        return ProjectVersion(
-            data["project_id"], data["project_name"], data["version"], data["builds"]
-        )
 
-
-@dataclass
-class BuildChange:
+class BuildChange(BaseModel):
     commit: str
     summary: str
     message: str
 
-    @staticmethod
-    def from_json(data: dict):
-        return BuildChange(data["commit"], data["summary"], data["message"])
 
-
-@dataclass
-class Download:
+class Download(BaseModel):
     name: str
     sha256: str
 
-    @staticmethod
-    def from_json(data: dict):
-        return Download(data["name"], data["sha256"])
 
-
-@dataclass
-class Build:
+class Build(BaseModel):
     build: int
-    time: str
+    time: datetime
     channel: str
     promoted: bool
     changes: list[BuildChange]
     downloads: dict[str, Download]
 
-    @staticmethod
-    def from_json(data: dict):
-        downloads = {}
-        for k, v in data["downloads"].items():
-            downloads[k] = Download.from_json(v)
-        return Build(
-            data["build"],
-            data["time"],
-            data["channel"],
-            data["promoted"],
-            [BuildChange.from_json(x) for x in data["changes"]],
-            downloads,
-        )
 
-
-@dataclass
-class BuildList:
+class BuildList(BaseModel):
     project_id: str
     project_name: str
     version: str
@@ -182,83 +103,25 @@ class BuildList:
         for x in self.builds:
             yield x
 
-    @staticmethod
-    def from_json(data: dict):
-        return BuildList(
-            data["project_id"],
-            data["project_name"],
-            data["version"],
-            [Build.from_json(x) for x in data["builds"]],
-        )
 
-
-@dataclass
-class Schema:
-    data: dict
-
-    @staticmethod
-    def from_json(data):
-        return Schema(data)
-
-
-@dataclass
-class Info:
+class Info(BaseModel):
     title: str
     version: str
 
-    @staticmethod
-    def from_json(data):
-        return Info(data["title"], data["version"])
 
-
-@dataclass
-class Server:
+class Server(BaseModel):
     url: str
     variables: dict
 
-    @staticmethod
-    def from_json(data):
-        return Server(data["url"], data["variables"])
 
-
-@dataclass
-class Path:
-    data: dict
-
-    @staticmethod
-    def from_json(data):
-        return Path(data)
-
-
-@dataclass
-class OpenAPI:
-    components: dict[str, dict[str, Schema]]
+class OpenAPI(BaseModel):
+    components: dict[str, dict[str, dict]]
     info: Info
     openapi: str
-    paths: dict[str, Path]
+    paths: dict[str, dict]
     security: list
     servers: list[Server]
     tags: list[str]
-
-    @staticmethod
-    def from_json(data):
-        paths = {}
-        for p, v in data["paths"].items():
-            paths[p] = Path.from_json(v)
-        components = {}
-        for c, v in data["components"].items():
-            components[c] = {}
-            for s, vv in v.items():
-                components[c][s] = Schema.from_json(vv)
-        return OpenAPI(
-            components,
-            Info.from_json(data["info"]),
-            data["openapi"],
-            paths,
-            data["security"],
-            [Server.from_json(x) for x in data["servers"]],
-            data["tags"],
-        )
 
 
 # API
@@ -274,7 +137,7 @@ def _get(endpoint, path, **kw):
     raise Exception(data)
 
 
-def get_bedrock_link(xuid: int) -> list:
+def get_bedrock_link(xuid: int) -> Link | None:
     """
     Get linked Java account from Bedrock xuid
 
@@ -283,10 +146,13 @@ def get_bedrock_link(xuid: int) -> list:
     :return: Linked accounts or an empty object if there is no account linked
     :rtype: list
     """
-    return _get(API_ENDPOINT, f"/v2/link/bedrock/{xuid}").json()
+    res = _get(API_ENDPOINT, f"/v2/link/bedrock/{xuid}").json()
+    if "last_name_update" in res:
+        return Link.model_validate(res)
+    return None
 
 
-def get_java_link(uuid: str) -> list:
+def get_java_link(uuid: str) -> list[Link]:
     """
     Get linked Bedrock account from Java UUID
 
@@ -295,12 +161,18 @@ def get_java_link(uuid: str) -> list:
     :return: Linked account or an empty object if there is no account linked
     :rtype: list
     """
-    return _get(API_ENDPOINT, f"/v2/link/java/{uuid}").json()
+    res = _get(API_ENDPOINT, f"/v2/link/java/{uuid}").json()
+    return [Link.model_validate(x) for x in res]
 
 
-# TODO: illegal online link data
-def verify_online_link() -> list:
-    return requests.post(API_ENDPOINT + f"/v2/link/online").json()
+# TODO: illegal online link data, internal server error, received invalid tokens, The provided value for the 'code' parameter is not valid.
+def verify_online_link(bedrock: str = None, java: str = None) -> list:
+    payload = {}
+    if bedrock:
+        payload["bedrock"] = bedrock
+    if java:
+        payload["java"] = java
+    return requests.post(API_ENDPOINT + f"/v2/link/online", json=payload).json()
 
 
 def get_all_stats() -> Statistics:
@@ -310,7 +182,7 @@ def get_all_stats() -> Statistics:
     :rtype: Statistics
     """
     res = _get(API_ENDPOINT, "/v2/stats").json()
-    return Statistics.from_json(res)
+    return Statistics.model_validate(res)
 
 
 def get_gamertag_batch(*xuids: str) -> dict[str, str]:
@@ -355,10 +227,10 @@ def get_recent_uploads() -> RecentConvertedSkinList:
     :rtype: RecentConvertedSkinList
     """
     res = _get(API_ENDPOINT, "/v2/skin/bedrock/recent").json()
-    return RecentConvertedSkinList.from_json(res)
+    return RecentConvertedSkinList.model_validate(res)
 
 
-def get_skin(xuid: int) -> ConvertedSkin:
+def get_skin(xuid: int) -> ConvertedSkin | None:
     """
     Get the most recently converted skin of a Bedrock player
 
@@ -368,7 +240,9 @@ def get_skin(xuid: int) -> ConvertedSkin:
     :rtype: ConvertedSkin
     """
     res = _get(API_ENDPOINT, f"/v2/skin/{xuid}").json()
-    return ConvertedSkin.from_json(res)
+    if "hash" in res:
+        return ConvertedSkin.model_validate(res)
+    return None
 
 
 def get_project_news(project: str) -> list:
@@ -393,7 +267,8 @@ def get_bedrock_or_java_uuid(username: str, prefix: str = ".") -> dict:
 
 def get_openapi() -> OpenAPI:
     res = _get(API_ENDPOINT, "/openapi").json()
-    return OpenAPI.from_json(res)
+    print(res)
+    return OpenAPI.model_validate(res)
 
 
 # DOWNLOAD
@@ -418,7 +293,7 @@ def get_project(project: str) -> Project:
     :rtype: Project
     """
     res = _get(DOWNLOAD_ENDPOINT, f"/v2/projects/{project}").json()
-    return Project.from_json(res)
+    return Project.model_validate(res)
 
 
 def get_version(project: str, version: str = "latest") -> ProjectVersion:
@@ -432,7 +307,7 @@ def get_version(project: str, version: str = "latest") -> ProjectVersion:
     :rtype: ProjectVersion
     """
     res = _get(DOWNLOAD_ENDPOINT, f"/v2/projects/{project}/versions/{version}").json()
-    return ProjectVersion.from_json(res)
+    return ProjectVersion.model_validate(res)
 
 
 def get_version_builds(project: str, version: str = "latest") -> BuildList:
@@ -448,7 +323,7 @@ def get_version_builds(project: str, version: str = "latest") -> BuildList:
     res = _get(
         DOWNLOAD_ENDPOINT, f"/v2/projects/{project}/versions/{version}/builds"
     ).json()
-    return BuildList.from_json(res)
+    return BuildList.model_validate(res)
 
 
 def get_build(project: str, version: str = "latest", build: str = "latest") -> Build:
@@ -466,7 +341,7 @@ def get_build(project: str, version: str = "latest", build: str = "latest") -> B
     res = _get(
         DOWNLOAD_ENDPOINT, f"/v2/projects/{project}/versions/{version}/builds/{build}"
     ).json()
-    return Build.from_json(res)
+    return Build.model_validate(res)
 
 
 def get_download(

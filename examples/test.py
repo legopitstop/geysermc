@@ -1,9 +1,10 @@
-import geysermc
+from geysermc import GeyserMC
 import mojang
 
-api = mojang.API()
+api1 = GeyserMC()
+api2 = mojang.API()
 
-xuid = geysermc.get_xuid('legopitstop')
-uuid = api.get_uuid('legopitstop')
+xuid = api1.get_xuid("legopitstop")
+uuid = api2.get_uuid("legopitstop")
 print(xuid, uuid)
-print(geysermc.verify_online_link(bedrock=xuid, java=uuid))
+print(api1.verify_online_link(bedrock=xuid, java=uuid))

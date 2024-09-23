@@ -1,5 +1,4 @@
-@REM Install Python package
-python setup.py install
-
-@REM Run pytest
+@REM Should be removed and use GitHub Actions
+mypy geysermc
+flake8 geysermc
 pytest

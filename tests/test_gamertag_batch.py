@@ -1,3 +1,5 @@
-import geysermc
+from geysermc import GeyserMC
 
-print(geysermc.get_gamertag_batch(2535429120293563))
+api = GeyserMC()
+
+print(api.get_gamertag_batch(2535429120293563))

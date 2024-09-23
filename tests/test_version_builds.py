@@ -1,3 +1,5 @@
-import geysermc
+from geysermc import GeyserMC
 
-print(geysermc.get_version_builds('geyser'))
+api = GeyserMC()
+
+print(api.get_version_builds("geyser"))

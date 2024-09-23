@@ -1,6 +1,8 @@
-import geysermc
+from geysermc import GeyserMC
 
-xuid = geysermc.get_xuid('legopitstop')
-skin = geysermc.get_skin(xuid)
-image = geysermc.get_raw_texture(skin.texture_id)
+api = GeyserMC()
+
+xuid = api.get_xuid("legopitstop")
+skin = api.get_skin(xuid)
+image = api.get_raw_texture(skin.texture_id)
 image.show()

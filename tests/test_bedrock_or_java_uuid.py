@@ -1,3 +1,5 @@
-import geysermc
+from geysermc import GeyserMC
 
-print(geysermc.get_bedrock_or_java_uuid('Notch'))
+api = GeyserMC()
+
+print(api.get_bedrock_or_java_uuid("Notch"))

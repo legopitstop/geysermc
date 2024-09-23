@@ -1,3 +1,5 @@
-import geysermc
+from geysermc import GeyserMC
 
-print(geysermc.get_xuid('notch'))
+api = GeyserMC()
+
+print(api.get_xuid("notch"))

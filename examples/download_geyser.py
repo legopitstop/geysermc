@@ -1,6 +1,7 @@
-import geysermc
+from geysermc import GeyserMC
 
-with open('geyser-spigot.jar', 'wb') as fd:
-    data = geysermc.get_download('geyser', 'spigot')
+api = GeyserMC()
+
+with open("geyser-spigot.jar", "wb") as fd:
+    data = api.get_download("geyser", "spigot")
     fd.write(data)
-    
