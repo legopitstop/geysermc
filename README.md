@@ -1,12 +1,12 @@
 # geysermc
 
-![Tests](https://github.com/legopitstop/geysermc/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/legopitstop/geysermc-py/actions/workflows/tests.yml/badge.svg)
 [![PyPI](https://img.shields.io/pypi/v/geysermc)](https://pypi.org/project/geysermc/)
 [![Python](https://img.shields.io/pypi/pyversions/geysermc)](https://www.python.org/downloads//)
 ![Downloads](https://img.shields.io/pypi/dm/geysermc)
 ![Status](https://img.shields.io/pypi/status/geysermc)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
-[![Issues](https://img.shields.io/github/issues/legopitstop/geysermc)](https://github.com/legopitstop/geysermc/issues)
+[![Issues](https://img.shields.io/github/issues/legopitstop/geysermc-py)](https://github.com/legopitstop/geysermc-py/issues)
 
 The unofficial Python wrapper for geysermc.org
 
